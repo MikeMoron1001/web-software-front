@@ -1,71 +1,88 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User
+from .models import Usuario
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 
+# Creación de una Blueprint llamada 'auth'
 auth = Blueprint('auth', __name__)
 
-@auth.route('/login', methods=['GET', 'POST'])
-def login():
+@auth.route('/inicio-sesion', methods=['GET', 'POST'])
+def inicio_sesion():
+    """
+    Vista para el inicio de sesión de usuarios.
+    """
+    rol=None
     if request.method == 'POST':
-        user = request.form.get('user')
-        password = request.form.get('password')
-        role = request.form.get('role')
+        usuario = request.form.get('usuario')
+        contrasena = request.form.get('contrasena')
+        rol = request.form.get('rol')
 
-        user_q = User.query.filter_by(user=user).first()
-        if user_q:
-            if role != user_q.role:
-                flash('Role incorrecto, intentelo otra vez.', category='error')
-            elif check_password_hash(user_q.password, password):
-                flash('Ingreso exitoso!', category='success')
-                login_user(user_q, remember=True)
-                if role == 'admin':
-                    return redirect(url_for('views.add_product'))
+        # Buscar el usuario en la base de datos
+        usuario_q = Usuario.query.filter_by(usuario=usuario.upper()).first()
+        if usuario_q:
+            if rol != usuario_q.rol:
+                flash('Rol incorrecto, inténtelo de nuevo.', category='error')
+            elif check_password_hash(usuario_q.contrasena, contrasena):
+                flash('Inicio de sesión exitoso!', category='success')
+                login_user(usuario_q, remember=True)
+                # Redirigir según el rol del usuario
+                if rol == 'Administrador':
+                    return redirect(url_for('vistas.agregar_producto'))
                 else:
-                    return redirect(url_for('views.production'))
+                    return redirect(url_for('vistas.produccion'))
             else:
-                flash('Contraseña incorrecta, intentelo otra vez.', category='error')
+                flash('Contraseña incorrecta, inténtelo de nuevo.', category='error')
         else:
             flash('El usuario no existe.', category='error')
-    return render_template("login.html", user=current_user)
+    return render_template("inicio_sesion.html", usuario=current_user, rol=rol)
 
-@auth.route('/logout')
+@auth.route('/cerrar-sesion')
 @login_required
-def logout():
+def cerrar_sesion():
+    """
+    Vista para cerrar sesión de usuarios.
+    """
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('auth.inicio_sesion'))
 
-@auth.route('/sign-up', methods=['GET', 'POST'])
-def sign_up():
+@auth.route('/registro', methods=['GET', 'POST'])
+def registro():
+    """
+    Vista para el registro de nuevos usuarios.
+    """
+    rol=None
     if request.method == 'POST':
         
-        user = request.form.get('user')
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
-        role = request.form.get('role')
+        usuario = request.form.get('usuario')
+        contrasena1 = request.form.get('contrasena1')
+        contrasena2 = request.form.get('contrasena2')
+        rol = request.form.get('rol')
         
-        user_q = User.query.filter_by(user=user).first()
-
-        if user_q and role == user_q.role:
-            flash('Usuario ya existe para este rol.', category='error')
-        elif len(user) < 4:
-            flash('Email must be greater than 3 characters.', category='error')
-        elif password1 != password2:
-            flash('Passwords don\'t match.', category='error')
-        elif len(password1) < 7:
-            flash('Password must be at least 7 characters.', category='error')
+        # Verificar si el usuario ya existe
+        usuario_q = Usuario.query.filter_by(usuario=usuario.upper()).first()
+        
+        if usuario_q:
+            flash('Este usuario.', category='error')
+        elif len(usuario) < 4:
+            flash('El usuario debe tener más de 3 caracteres.', category='error')
+        elif contrasena1 != contrasena2:
+            flash('Las contraseñas no coinciden.', category='error')
+        elif len(contrasena1) < 7:
+            flash('La contraseña debe tener al menos 7 caracteres.', category='error')
         else:
             
-            new_user = User(user=user, password=generate_password_hash(password1), role=role)
+            # Crear un nuevo usuario y guardarlo en la base de datos
+            nuevo_usuario = Usuario(usuario=usuario.upper(), contrasena=generate_password_hash(contrasena1), rol=rol)
             
-            db.session.add(new_user)
+            db.session.add(nuevo_usuario)
             db.session.commit()
-            login_user(new_user, remember=True) 
-            flash('Account created!', category='success')
-            if role == 'admin':
-                return redirect(url_for('views.add_product'))
+            login_user(nuevo_usuario, remember=True) 
+            flash('¡Cuenta creada!', category='success')
+            # Redirigir según el rol del nuevo usuario
+            if rol == 'Administrador':
+                return redirect(url_for('vistas.agregar_producto'))
             else:
-                return redirect(url_for('views.production'))
+                return redirect(url_for('vistas.produccion'))
 
-    return render_template("sign_up.html", user=current_user)
+    return render_template("registro.html", usuario=current_user, rol=rol)

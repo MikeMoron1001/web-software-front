@@ -29,13 +29,17 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
-            {% if user.is_authenticated %}
-                <a class="nav-item nav-link" id="add_product" href="/add_product">Agregar producto</a>
-                <a class="nav-item nav-link" id="production" href="/production">Producción</a>
-                <a class="nav-item nav-link" id="logout" href="/logout">Salir</a>
+            {% if usuario.is_authenticated %}
+              <a class="nav-item nav-link" id="cerrar-sesion" href="/cerrar-sesion">Salir</a>
+              {% if rol == 'Administrador' %}
+                <a class="nav-item nav-link" id="agregar_producto" href="/agregar_producto">Agregar producto</a>
+                <a class="nav-item nav-link" id="nomina" href="/nomina">Nomina</a>
+              {% else %}
+                <a class="nav-item nav-link" id="produccion" href="/produccion">Producción</a>
+              {% endif %}
             {% else %}
-                <a class="nav-item nav-link" id="login" href="/login">Ingresar</a>
-                <a class="nav-item nav-link" id="signUp" href="/sign-up">Registrarse</a>
+                <a class="nav-item nav-link" id="/inicio-sesion" href="/inicio-sesion">Ingresar</a>
+                <a class="nav-item nav-link" id="registro" href="/registro">Registrarse</a>
             {% endif %}
         </div>
       </div>

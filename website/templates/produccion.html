@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Registrar producción{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+    <h3 align="center">Registrar productos</h3>
+
+    <div class="form-group">
+        <label for="producto">Seleccione un producto:</label>
+        <select name="producto" id="producto" class="form-control" required>
+            {% for producto in productos %}
+                <option value="{{ producto.id }}">{{ producto.nombre_producto }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Registrar</button>
+</form>
+
+{% endblock %}

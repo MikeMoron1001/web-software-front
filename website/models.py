@@ -3,31 +3,30 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 from datetime import datetime
 
-class Note (db.Model):
+# Modelo para la entidad Usuario
+class Usuario(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.String(10000))
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    usuario = db.Column(db.String(150))
+    contrasena = db.Column(db.String(350))
+    rol = db.Column(db.String(50))
 
-class User(db.Model, UserMixin):
-    
+# Modelo para la entidad Producto
+class Producto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.String(150), unique=True)
-    password = db.Column(db.String(150))
-    role = db.Column(db.String(50))
-    # products = db.relationship('Product', backref='user', lazy=True)
-    # productions = db.relationship('Production', backref='user', lazy=True)
+    nombre_producto = db.Column(db.String(150), unique=True)
+    precio = db.Column(db.Float(precision=2))
+    precio_paquete = db.Column(db.Float(precision=2))
 
-class Product(db.Model):
+# Modelo para la entidad Produccion
+class Produccion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    product_name = db.Column(db.String(150), unique=True)
-    price = db.Column(db.Float(precision=2))
-    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    nombre_producto = db.Column(db.String(150))
+    precio = db.Column(db.Float(precision=2))
+    contador_id = db.Column(db.Integer)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    usuario = db.Column(db.String(150))
+    id_usuario = db.Column(db.Integer, nullable=False)
+    rol = db.Column(db.String(50))
+
     
-# class Production(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-#     quantity = db.Column(db.Integer)
-#     date = db.Column(db.DateTime, default=datetime.utcnow)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
   

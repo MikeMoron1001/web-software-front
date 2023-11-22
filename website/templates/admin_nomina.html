@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+    <form method="POST">
+
+        <h3 align="center">Nomina</h3>
+
+        <div class="form-group">
+            <label for="rol">Escoja el rol a buscar:</label>
+            <select id="rol" name="rol" class="form-control" required>
+                <option value="Cortador">Cortador</option>
+                <option value="Guarnecedor">Guarnecedor</option>
+                <option value="Ensamblador">Ensamblador</option>
+            </select>
+        </div>
+    
+        <div class="form-group">
+            <label for="fecha_inicio">Fecha de inicio:</label>
+            <input
+                type="date"
+                class="form-control"
+                id="fecha_inicio"
+                name="fecha_inicio"
+                placeholder="Ingrese la fecha"
+                required
+            />
+        </div>
+        <div class="form-group">
+            <label for="fecha_fin">Fecha de fin:</label>
+            <input
+                type="date"
+                class="form-control"
+                id="fecha_fin"
+                name="fecha_fin"
+                placeholder="Ingrese la fecha"
+                required
+            />
+        </div>
+
+
+
+        <br />
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    {% if producciones %}
+
+        {% for produccion_user in producciones %}
+            <h1>
+                Producciones de {{ produccion_user[0] }} entre {{ fecha_inicio }} y {{ fecha_fin }}
+            </h1>
+            <ul>
+            {% for produccion in produccion_user[1] %}
+                <li>Producto: {{ produccion[0] }} - Paquetes: {{ produccion[1] }}, Pago paquetes: {{ produccion[2] }} -  Productos adicionales: {{ produccion[3] }}, Pago productos: {{ produccion[4] }}</li>
+            {% endfor %}
+            </ul>
+
+            {% if pago_total %}
+        
+                {% for pago_total_user in pago_total %}
+                    {% if pago_total_user[0] == produccion_user[0] %}
+                        <h3>Pago total de {{ pago_total_user[0] }}: ${{ pago_total_user[1] }}</h3>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+        {% endfor %}
+
+        
+    {% endif %}
+
+    
+    
+{% endblock %}
